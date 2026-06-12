@@ -1,38 +1,39 @@
-# Off The Cuff — Speak Trainer
+# SpeechTeacher
 
-A free, private, in-browser public-speaking trainer. Get a prompt, speak off the cuff, and get instant feedback on your delivery — filler words, pace, and word count — with **all speech transcription running locally on your device** (no uploads, no accounts, no paid services).
+A free, private public-speaking trainer and marketing site. Get a prompt, speak off the cuff, and get instant feedback on your delivery — filler words, pace, and word count — with **all speech transcription running locally on your device** (no uploads, no accounts, no paid services).
 
-## Features
+Production domain: **speechteacher.in**
 
-- 🎯 **Daily speaking prompts** (with shuffle)
-- 🎙️ **Record + playback** your response (browser `MediaRecorder`)
-- 🧠 **On-device transcription** via Whisper (`whisper-tiny.en`, transformers.js) — works offline after first load, in any browser including Opera
-- 🚫 **Filler-word detection** ("um", "uh", "like", "you know", …) with highlighting
-- ⏱️ **Words-per-minute** with pace guidance (110–160 = conversational)
-- 📊 **Progress charts + session history** (saved locally)
-- 🔥 **Practice streak** to build the habit
+## Stack
 
-## Run it locally
+- **[Astro](https://astro.build)** — multi-page (MPA) architecture for SEO; every route is static HTML
+- **[Tailwind CSS v4](https://tailwindcss.com)** — CSS-first design tokens (Vercel design language, see [DESIGN.md](DESIGN.md))
+- **[transformers.js](https://github.com/xenova/transformers.js)** — on-device Whisper transcription (WASM), no backend
 
-Speech transcription requires the page to be served over `http://localhost` (not opened as a `file://` path). From this folder:
+## Pages
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Landing — hero, how-it-works, features, comparison |
+| `/features` | Feature deep-dives |
+| `/how-it-works` | The practice loop + FAQ |
+| `/pricing` | Free + Pro tiers |
+| `/about` | Mission and principles |
+| `/practice` | The on-device speech trainer |
+| `/resources` | SEO articles |
+
+## Develop
 
 ```bash
-python -m http.server 8000
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # static output in dist/
+npm run preview  # preview the production build
 ```
 
-Then open **http://localhost:8000** in your browser.
+> The trainer downloads the Whisper model (~40 MB) once on first use, then caches it for offline use. Allow microphone access when prompted.
 
-> First run downloads the Whisper model (~40 MB) once, then caches it for offline use. Allow microphone access when prompted.
+## Project docs
 
-## Tech
-
-Single static `index.html` — no build step, no backend. Everything runs client-side:
-
-| Concern | Tool | Cost |
-|--------|------|------|
-| Audio capture | MediaRecorder API | $0 |
-| Speech-to-text | Whisper via transformers.js (WASM) | $0 |
-| Analysis | Plain JavaScript | $0 |
-| Storage | Browser `localStorage` | $0 |
-
-See [PRD.md](PRD.md) for the full product spec and roadmap.
+- [PRD.md](PRD.md) — product spec and roadmap
+- [DESIGN.md](DESIGN.md) — Vercel-inspired design system reference
