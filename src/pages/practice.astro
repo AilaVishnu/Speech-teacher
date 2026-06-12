@@ -529,7 +529,11 @@ function cleanTranscript(raw) {
 }
 
 async function startRecording() {
-  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+    });
+  }
   catch (e) { statusEl.textContent = "🎤 Microphone access denied. Allow it and try again."; return; }
   chunks = []; transcriptBox.innerHTML = ""; results.classList.add("hidden"); playback.classList.add("hidden");
   mediaRecorder = new MediaRecorder(stream);
@@ -560,8 +564,10 @@ async function onStopped() {
     const audio = await blobTo16kMono(blob);
 
     // Mic check: if the captured audio is near-silent, it's a hardware/permission issue, not the model
-    if (audioPeak(audio) < 0.01) {
-      statusEl.innerHTML = "🔇 Your recording was nearly silent. Play it back below — if you can't hear yourself, your mic is muted or the wrong input is selected. Check the mic icon in your browser's address bar, pick the right device, and try again.";
+    const peak = audioPeak(audio);
+    const levelPct = Math.round(peak * 100);
+    if (peak < 0.01) {
+      statusEl.innerHTML = "🔇 Mic level was only " + levelPct + "% — almost no sound reached the page. Play the recording below: if you can't hear yourself, the wrong input is selected or its volume is near zero. Click the mic icon in Opera's address bar to pick the right device, raise the input level in Windows Sound settings, and try again.";
       recordBtn.disabled = false; return;
     }
 
