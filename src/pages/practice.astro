@@ -23,7 +23,7 @@ import Layout from "../layouts/Layout.astro";
     <!-- Recorder -->
     <div class="mt-6 rounded-lg border border-hairline bg-canvas p-6 text-center shadow-soft">
       <div id="timer" class="text-5xl font-semibold tabular-nums text-mute">0:00</div>
-      <div id="status" role="status" aria-live="polite" class="mt-2 min-h-5 text-sm text-mute"><span class="spinner"></span>Loading the accurate speech model (one-time, ~250&nbsp;MB)… read the prompt while you wait.</div>
+      <div id="status" role="status" aria-live="polite" class="mt-2 min-h-5 text-sm text-mute"><span class="spinner"></span>Warming up the recorder… read the prompt while you wait.</div>
       <div class="mt-4 flex justify-center gap-3">
         <button id="recordBtn" class="rounded-full bg-error px-6 py-3 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40" disabled>● Record</button>
         <button id="stopBtn" class="rounded-full bg-warning px-6 py-3 font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-40" disabled>■ Stop</button>
@@ -152,8 +152,9 @@ import Layout from "../layouts/Layout.astro";
   </section>
 </Layout>
 
-<!-- Styles for JS-injected (uncontrolled) markup only -->
-<style>
+<!-- Styles for JS-injected markup. Global because these elements are created at
+     runtime and never carry Astro's scoped data attribute. -->
+<style is:global>
   .spinner { display:inline-block; width:12px; height:12px; border:2px solid #888; border-top-color:#0070f3; border-radius:50%; animation: spin .7s linear infinite; margin-right:6px; vertical-align:-1px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .dot { display:inline-block; width:9px; height:9px; border-radius:50%; background:#ee0000; margin-right:6px; }
@@ -491,7 +492,7 @@ function renderTips(listId, blockId, items, cls, icon) {
 
 async function loadModel() {
   try {
-    transcriber = await pipeline("automatic-speech-recognition", "Xenova/whisper-small.en");
+    transcriber = await pipeline("automatic-speech-recognition", "Xenova/whisper-base.en");
     statusEl.textContent = "Tap record, then speak about the prompt.";
     recordBtn.disabled = false;
   } catch (e) {
@@ -579,7 +580,7 @@ async function onStopped() {
   const blob = new Blob(chunks, { type: mediaRecorder.mimeType || "audio/webm" });
   playback.src = URL.createObjectURL(blob); playback.classList.remove("hidden");
   if (stream) stream.getTracks().forEach(t => t.stop());
-  statusEl.innerHTML = '<span class="spinner"></span> Transcribing on your device… (the accurate model takes a moment)';
+  statusEl.innerHTML = '<span class="spinner"></span> Transcribing on your device…';
   try {
     const audio = await blobTo16kMono(blob);
 
