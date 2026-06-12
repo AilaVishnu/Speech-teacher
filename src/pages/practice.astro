@@ -120,7 +120,7 @@ import Layout from "../layouts/Layout.astro";
     <div class="mt-6 flex items-center justify-between rounded-lg border border-hairline bg-canvas p-6 shadow-soft">
       <div>
         <p class="font-mono text-xs uppercase tracking-wide text-mute">Practice streak</p>
-        <p class="mt-0.5 text-xs text-mute">Sessions completed</p>
+        <p class="mt-0.5 text-xs text-mute">Days in a row — practice daily to keep it</p>
       </div>
       <div id="streakVal" class="text-2xl font-semibold">0 🔥</div>
     </div>
@@ -224,16 +224,35 @@ function pickPrompt() { promptText.textContent = PROMPTS[Math.floor(Math.random(
 el("newPrompt").addEventListener("click", pickPrompt);
 pickPrompt();
 
-function loadStreak() {
-  const n = parseInt(localStorage.getItem("otc_streak") || "0", 10);
-  streakVal.textContent = n + " 🔥"; return n;
+// Daily streak: consecutive days with at least one practice session.
+function localDateStr(d) {
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
-function bumpStreak() {
-  const n = loadStreak() + 1;
-  localStorage.setItem("otc_streak", String(n));
+function daysBetween(a, b) {
+  return Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00:00")) / 86400000);
+}
+function streakIsAlive(lastDate) {
+  return !!lastDate && daysBetween(lastDate, localDateStr(new Date())) <= 1;
+}
+function showStreak() {
+  let n = parseInt(localStorage.getItem("otc_streak") || "0", 10);
+  if (!streakIsAlive(localStorage.getItem("otc_streak_date"))) n = 0; // broken → display 0
   streakVal.textContent = n + " 🔥";
+  return n;
 }
-loadStreak();
+function recordPractice() {
+  const today = localDateStr(new Date());
+  const lastDate = localStorage.getItem("otc_streak_date");
+  let streak = parseInt(localStorage.getItem("otc_streak") || "0", 10);
+  if (lastDate !== today) {
+    // First session of a new day: continue streak if yesterday, else restart at 1.
+    streak = lastDate && daysBetween(lastDate, today) === 1 ? streak + 1 : 1;
+    localStorage.setItem("otc_streak", String(streak));
+    localStorage.setItem("otc_streak_date", today);
+  }
+  streakVal.textContent = streak + " 🔥";
+}
+showStreak();
 
 const HISTORY_KEY = "otc_history";
 function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch (e) { return []; } }
@@ -611,7 +630,7 @@ async function onStopped() {
 
     renderTranscript(transcript);
     const a = analyze(transcript, durationMs, pauses);
-    showResults(a); bumpStreak(); saveSession(promptText.textContent, a); renderHistory();
+    showResults(a); recordPractice(); saveSession(promptText.textContent, a); renderHistory();
     statusEl.textContent = "Done! Review your delivery below.";
   } catch (e) {
     statusEl.textContent = "⚠️ Transcription failed: " + (e.message || e);
