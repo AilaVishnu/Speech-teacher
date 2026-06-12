@@ -511,6 +511,23 @@ async function blobTo16kMono(blob) {
   return rendered.getChannelData(0);
 }
 
+// Loudness of the captured audio — used to detect a dead/silent mic
+function audioPeak(audio) {
+  let peak = 0;
+  for (let i = 0; i < audio.length; i++) { const v = Math.abs(audio[i]); if (v > peak) peak = v; }
+  return peak;
+}
+
+// Strip Whisper's non-speech annotations: [BLANK_AUDIO], [Music], (applause), *laughs*…
+function cleanTranscript(raw) {
+  return (raw || "")
+    .replace(/\[[^\]]*\]/g, " ")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/\*[^*]*\*/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function startRecording() {
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
   catch (e) { statusEl.textContent = "🎤 Microphone access denied. Allow it and try again."; return; }
@@ -541,9 +558,16 @@ async function onStopped() {
   statusEl.innerHTML = '<span class="spinner"></span> Transcribing on your device…';
   try {
     const audio = await blobTo16kMono(blob);
+
+    // Mic check: if the captured audio is near-silent, it's a hardware/permission issue, not the model
+    if (audioPeak(audio) < 0.01) {
+      statusEl.innerHTML = "🔇 Your recording was nearly silent. Play it back below — if you can't hear yourself, your mic is muted or the wrong input is selected. Check the mic icon in your browser's address bar, pick the right device, and try again.";
+      recordBtn.disabled = false; return;
+    }
+
     const out = await transcriber(audio, { chunk_length_s: 30, stride_length_s: 5, return_timestamps: true });
-    const transcript = (out.text || "").trim();
-    if (!transcript) { statusEl.textContent = "⚠️ Didn't catch any speech. Try speaking a bit louder and longer."; recordBtn.disabled = false; return; }
+    const transcript = cleanTranscript(out.text);
+    if (!transcript) { statusEl.innerHTML = "⚠️ Audio came through but no clear speech was detected. Try speaking a bit louder and closer to the mic, in a quieter spot."; recordBtn.disabled = false; return; }
 
     // Detect long pauses from segment timestamps
     const pauses = [];
