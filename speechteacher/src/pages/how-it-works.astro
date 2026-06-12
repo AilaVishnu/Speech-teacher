@@ -1,0 +1,110 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CTASection from "../components/CTASection.astro";
+
+const steps = [
+  {
+    n: "01",
+    title: "You get a prompt",
+    body: "Open the trainer and a speaking prompt appears — a question, a scenario, a topic. There's nothing to set up and nothing to decide. Shuffle if you want a different one.",
+  },
+  {
+    n: "02",
+    title: "You speak, we listen — locally",
+    body: "Press record and talk. Your microphone audio is captured in the browser and transcribed on your own machine by the Whisper speech model. Nothing is streamed to a server.",
+  },
+  {
+    n: "03",
+    title: "You get instant feedback",
+    body: "The second you stop, you see your pace (words per minute), your filler-word count with a breakdown, and a transcript with every filler highlighted.",
+  },
+  {
+    n: "04",
+    title: "You watch yourself improve",
+    body: "Each session is saved locally and added to your trend charts and streak. Come back tomorrow and the prompt is new — but your progress carries over.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Is my voice or audio uploaded anywhere?",
+    a: "No. Transcription happens entirely in your browser using WebAssembly. Your audio and transcript never leave your device, and there is no account or server storing them.",
+  },
+  {
+    q: "Do I need an internet connection?",
+    a: "Only for the very first visit, to download the speech model (~40MB). After that it's cached and the trainer works fully offline.",
+  },
+  {
+    q: "Which browsers are supported?",
+    a: "Any modern browser — Chrome, Edge, Firefox, Safari, and Opera. Because transcription is on-device, it doesn't depend on browser-specific speech services.",
+  },
+  {
+    q: "How long should I speak?",
+    a: "Aim for 30–90 seconds per rep. Short, frequent reps build the habit faster than occasional long sessions.",
+  },
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+---
+
+<Layout
+  title="How it works"
+  description="How SpeechTeacher works: get a prompt, speak, and get instant on-device feedback on pace and filler words. No uploads, no account, works offline."
+  jsonLd={jsonLd}
+>
+  <section class="container-page pt-20 pb-12 text-center">
+    <p class="font-mono text-xs uppercase tracking-wide text-mute">How it works</p>
+    <h1 class="mx-auto mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+      Prompt. Speak. Improve.
+    </h1>
+    <p class="mx-auto mt-5 max-w-2xl text-lg text-body">
+      The whole loop takes under a minute — and every piece of it runs on your device.
+    </p>
+  </section>
+
+  <section class="container-page pb-16">
+    <ol class="mx-auto max-w-3xl space-y-4">
+      {steps.map((s) => (
+        <li class="flex gap-6 rounded-lg border border-hairline bg-canvas p-6 shadow-soft sm:p-8">
+          <span class="text-gradient font-mono text-2xl font-semibold">{s.n}</span>
+          <div>
+            <h2 class="text-xl font-semibold tracking-tight">{s.title}</h2>
+            <p class="mt-2 text-body">{s.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- FAQ -->
+  <section class="bg-canvas-soft-2/60 py-20">
+    <div class="container-page mx-auto max-w-3xl">
+      <h2 class="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+        Questions, answered.
+      </h2>
+      <div class="mt-10 space-y-3">
+        {faqs.map((f) => (
+          <details class="group rounded-md border border-hairline bg-canvas p-5 shadow-soft">
+            <summary class="cursor-pointer list-none font-medium text-ink marker:hidden">
+              <span class="flex items-center justify-between gap-4">
+                {f.q}
+                <span class="text-mute transition-transform group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-3 text-body">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTASection />
+</Layout>

@@ -1,0 +1,54 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CTASection from "../components/CTASection.astro";
+---
+
+<Layout
+  title="About"
+  description="SpeechTeacher exists to make public-speaking practice frictionless, private, and free. Here's why we built it and what we believe."
+>
+  <section class="container-page pt-20 pb-12">
+    <div class="mx-auto max-w-2xl">
+      <p class="font-mono text-xs uppercase tracking-wide text-mute">About</p>
+      <h1 class="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+        The only cure for the fear is reps.
+      </h1>
+      <p class="mt-6 text-lg text-body">
+        Public speaking is the most common fear in the world — ranked above heights,
+        spiders, even death. Yet almost no one teaches us how to get past it. The advice
+        is always the same: "just practice." But practice is exactly the part that's hard
+        to start. It feels awkward, it needs an audience, and it gives you no feedback.
+      </p>
+      <p class="mt-4 text-body">
+        We built SpeechTeacher to remove every excuse between you and your next rep.
+        Open it, get a prompt, speak for a minute, and see exactly how you did. No
+        audience. No judgment. No setup.
+      </p>
+
+      <h2 class="mt-12 text-2xl font-semibold tracking-tight">What we believe</h2>
+      <div class="mt-6 space-y-4">
+        {[
+          ["Privacy isn't a feature, it's the default.", "Your fumbling first attempts should be yours alone. That's why transcription runs on your device and nothing is ever uploaded. Practice is honest only when no one is watching."],
+          ["Feedback should be instant and objective.", "You can't fix what you can't measure. Pace and filler words are concrete, repeatable numbers — so progress is something you can actually see, not just feel."],
+          ["The barrier is starting, not knowing.", "Most people already know they should practice. Our entire job is to make the gap between intention and first word as close to zero as possible."],
+          ["Free should mean free.", "No trial countdowns, no dark patterns, no credit card to 'get started'. The core trainer is free because reps shouldn't have a paywall."],
+        ].map(([h, b]) => (
+          <div class="rounded-md border border-hairline bg-canvas p-6 shadow-soft">
+            <h3 class="font-semibold tracking-tight">{h}</h3>
+            <p class="mt-2 text-sm text-body">{b}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="mt-12 text-2xl font-semibold tracking-tight">Where we're headed</h2>
+      <p class="mt-4 text-body">
+        Today SpeechTeacher measures the mechanics of delivery — pace and filler words.
+        Next we're adding qualitative AI coaching on structure and clarity, hesitation
+        detection, timed challenges, and themed prompt packs for interviews and pitches.
+        The mission stays the same: more reps, less fear.
+      </p>
+    </div>
+  </section>
+
+  <CTASection />
+</Layout>

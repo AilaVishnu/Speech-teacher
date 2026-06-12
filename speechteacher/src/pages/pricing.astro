@@ -1,0 +1,126 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Button from "../components/Button.astro";
+import CTASection from "../components/CTASection.astro";
+
+const tiers = [
+  {
+    name: "Free",
+    price: "₹0",
+    cadence: "forever",
+    tagline: "Everything you need to build the habit.",
+    cta: "Start practicing",
+    href: "/practice",
+    featured: false,
+    features: [
+      "On-device transcription (Whisper)",
+      "Filler-word + pace feedback",
+      "Unlimited practice reps",
+      "Session history & trend charts",
+      "Practice streak",
+      "Works offline",
+    ],
+  },
+  {
+    name: "Pro",
+    price: "₹299",
+    cadence: "/ month",
+    tagline: "Deeper coaching for serious speakers.",
+    cta: "Join the waitlist",
+    href: "/about",
+    featured: true,
+    features: [
+      "Everything in Free",
+      "AI delivery coaching (structure, clarity)",
+      "Hesitation & long-pause detection",
+      "Timed challenge modes",
+      "Themed prompt packs (interview, pitch…)",
+      "Export transcripts & reports",
+    ],
+  },
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: "SpeechTeacher",
+  description: "Private public-speaking practice with instant on-device feedback.",
+  offers: [
+    { "@type": "Offer", name: "Free", price: "0", priceCurrency: "INR" },
+    { "@type": "Offer", name: "Pro", price: "299", priceCurrency: "INR" },
+  ],
+};
+---
+
+<Layout
+  title="Pricing"
+  description="SpeechTeacher is free forever for unlimited private practice. Pro adds AI delivery coaching, hesitation detection, and themed prompt packs."
+  jsonLd={jsonLd}
+>
+  <section class="container-page pt-20 pb-12 text-center">
+    <p class="font-mono text-xs uppercase tracking-wide text-mute">Pricing</p>
+    <h1 class="mx-auto mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+      Start free. Stay free if you like.
+    </h1>
+    <p class="mx-auto mt-5 max-w-2xl text-lg text-body">
+      The core trainer is free forever — no card, no trial timer. Pro is for when you
+      want an AI coach in your corner.
+    </p>
+  </section>
+
+  <section class="container-page pb-16">
+    <div class="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
+      {tiers.map((t) => (
+        <div
+          class={`flex flex-col rounded-lg p-8 ${
+            t.featured
+              ? "bg-primary text-on-primary shadow-float"
+              : "border border-hairline bg-canvas text-ink shadow-soft"
+          }`}
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-semibold tracking-tight">{t.name}</h2>
+            {t.featured && (
+              <span class="rounded-full bg-white/15 px-3 py-1 font-mono text-xs uppercase">
+                Coming soon
+              </span>
+            )}
+          </div>
+          <p class={`mt-1 text-sm ${t.featured ? "text-white/70" : "text-body"}`}>
+            {t.tagline}
+          </p>
+          <p class="mt-6 flex items-baseline gap-1">
+            <span class="text-4xl font-semibold tracking-tight">{t.price}</span>
+            <span class={`text-sm ${t.featured ? "text-white/60" : "text-mute"}`}>
+              {t.cadence}
+            </span>
+          </p>
+
+          <ul class="mt-8 flex-1 space-y-3">
+            {t.features.map((f) => (
+              <li class="flex items-start gap-3 text-sm">
+                <span class={t.featured ? "text-cyan" : "text-gradient"}>✓</span>
+                <span class={t.featured ? "text-white/90" : "text-body"}>{f}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div class="mt-8">
+            <Button
+              href={t.href}
+              variant={t.featured ? "secondary" : "primary"}
+              class="w-full"
+            >
+              {t.cta}
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+    <p class="mt-8 text-center text-sm text-mute">
+      Pro pricing is indicative and not yet live. The Free tier is fully available today.
+    </p>
+  </section>
+
+  <CTASection />
+</Layout>

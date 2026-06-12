@@ -1,0 +1,49 @@
+---
+const links = [
+  { href: "/features", label: "Features" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/resources", label: "Resources" },
+  { href: "/about", label: "About" },
+];
+const current = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? current === "/" : current.startsWith(href);
+---
+
+<header class="sticky top-0 z-50 border-b border-hairline bg-canvas/80 backdrop-blur-md">
+  <nav class="container-page flex h-16 items-center justify-between gap-4" aria-label="Primary">
+    <a href="/" class="flex items-center gap-2 font-semibold tracking-tight text-ink">
+      <span
+        class="mesh-gradient inline-block h-6 w-6 rounded-md"
+        style="filter:none;"
+        aria-hidden="true"></span>
+      SpeechTeacher
+    </a>
+
+    <ul class="hidden items-center gap-1 md:flex">
+      {links.map((l) => (
+        <li>
+          <a
+            href={l.href}
+            aria-current={isActive(l.href) ? "page" : undefined}
+            class={`rounded-full px-3 py-2 text-sm transition-colors hover:text-ink ${
+              isActive(l.href) ? "text-ink" : "text-body"
+            }`}
+          >
+            {l.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="flex items-center gap-2">
+      <a
+        href="/practice"
+        class="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-on-primary transition-opacity hover:opacity-90"
+      >
+        Start practicing
+      </a>
+    </div>
+  </nav>
+</header>

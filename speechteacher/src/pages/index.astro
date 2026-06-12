@@ -1,0 +1,176 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Button from "../components/Button.astro";
+import CTASection from "../components/CTASection.astro";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "SpeechTeacher",
+  applicationCategory: "EducationalApplication",
+  operatingSystem: "Web",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+  description:
+    "Practice public speaking privately with instant feedback on pace and filler words, transcribed on your device.",
+  url: "https://speechteacher.in",
+};
+
+const steps = [
+  {
+    n: "01",
+    title: "Get a prompt",
+    body: "Open the trainer and you're handed a speaking prompt. No staring at a blank page.",
+  },
+  {
+    n: "02",
+    title: "Speak off the cuff",
+    body: "Hit record and talk for 30–90 seconds. No audience, no judgment — just reps.",
+  },
+  {
+    n: "03",
+    title: "See your delivery",
+    body: "Get pace, filler-word count, and a full transcript the moment you stop.",
+  },
+];
+
+const features = [
+  {
+    title: "On-device transcription",
+    body: "Whisper runs in your browser. Your voice never leaves your device — no upload, no account.",
+  },
+  {
+    title: "Filler-word radar",
+    body: "Every “um”, “uh”, and “like” is counted and highlighted so you can hear your own habits.",
+  },
+  {
+    title: "Pace coaching",
+    body: "Words-per-minute with guidance — know instantly when you're rushing or dragging.",
+  },
+  {
+    title: "Progress over time",
+    body: "Session history and trend charts turn single reps into visible improvement.",
+  },
+  {
+    title: "Works offline",
+    body: "After the first load, practice on a plane, a train, anywhere — no connection needed.",
+  },
+  {
+    title: "Free to start",
+    body: "The core trainer is free. No credit card, no trial countdown, no dark patterns.",
+  },
+];
+---
+
+<Layout
+  title="SpeechTeacher — Practice public speaking, privately"
+  description="Beat the fear of public speaking with daily reps. Get instant feedback on pace and filler words, transcribed privately on your device. Free to start."
+  jsonLd={jsonLd}
+>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div
+      class="mesh-gradient pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[420px] max-w-4xl opacity-60"
+      aria-hidden="true"
+    ></div>
+    <div class="container-page pt-24 pb-20 text-center">
+      <a
+        href="/resources/overcome-fear-of-public-speaking"
+        class="inline-flex items-center gap-2 rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-body shadow-soft"
+      >
+        <span class="font-mono text-xs text-mute">NEW</span>
+        The #1 fear in the world — and how to beat it →
+      </a>
+
+      <h1 class="mx-auto mt-8 max-w-3xl text-4xl font-semibold tracking-tight text-ink sm:text-6xl">
+        Public speaking is a skill. <br class="hidden sm:block" />
+        <span class="text-gradient">Practice it like one.</span>
+      </h1>
+      <p class="mx-auto mt-6 max-w-2xl text-lg text-body">
+        Most people never practice because it feels awkward and gives no feedback.
+        SpeechTeacher hands you a prompt, listens as you speak, and shows you exactly
+        where to improve — all privately, on your device.
+      </p>
+      <div class="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <Button href="/practice">Start practicing free</Button>
+        <Button href="/how-it-works" variant="secondary">See how it works</Button>
+      </div>
+      <p class="mt-5 font-mono text-xs text-mute">
+        No sign-up · No upload · Runs in your browser
+      </p>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="container-page py-20">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="font-mono text-xs uppercase tracking-wide text-mute">How it works</p>
+      <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+        A full rep in under a minute.
+      </h2>
+    </div>
+    <div class="mt-14 grid gap-6 md:grid-cols-3">
+      {steps.map((s) => (
+        <div class="rounded-md border border-hairline bg-canvas p-6 shadow-soft">
+          <p class="font-mono text-sm text-mute">{s.n}</p>
+          <h3 class="mt-3 text-xl font-semibold tracking-tight">{s.title}</h3>
+          <p class="mt-2 text-body">{s.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="bg-canvas-soft-2/60 py-20">
+    <div class="container-page">
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="font-mono text-xs uppercase tracking-wide text-mute">Features</p>
+        <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+          Feedback that's instant, honest, and yours alone.
+        </h2>
+      </div>
+      <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {features.map((f) => (
+          <div class="rounded-md border border-hairline bg-canvas p-6 shadow-soft">
+            <h3 class="text-lg font-semibold tracking-tight">{f.title}</h3>
+            <p class="mt-2 text-sm text-body" set:html={f.body}></p>
+          </div>
+        ))}
+      </div>
+      <div class="mt-10 text-center">
+        <Button href="/features" variant="secondary" size="md">Explore all features</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why us / comparison -->
+  <section class="container-page py-20">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="font-mono text-xs uppercase tracking-wide text-mute">Why SpeechTeacher</p>
+      <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+        Built differently on purpose.
+      </h2>
+    </div>
+    <div class="mx-auto mt-12 max-w-3xl overflow-hidden rounded-lg border border-hairline bg-canvas shadow-float">
+      <div class="grid grid-cols-3 border-b border-hairline bg-canvas-soft font-mono text-xs uppercase tracking-wide text-mute">
+        <div class="p-4">What matters</div>
+        <div class="p-4 text-ink">SpeechTeacher</div>
+        <div class="p-4">Typical apps</div>
+      </div>
+      {[
+        ["Your audio", "Stays on device", "Uploaded to servers"],
+        ["Account required", "No", "Usually yes"],
+        ["Works offline", "Yes", "Rarely"],
+        ["See value before signing up", "Instantly", "Gated behind onboarding"],
+        ["Cost to start", "Free", "Trial / paywall"],
+      ].map((row, i) => (
+        <div class={`grid grid-cols-3 text-sm ${i % 2 ? "bg-canvas-soft/50" : ""}`}>
+          <div class="p-4 text-body">{row[0]}</div>
+          <div class="p-4 font-medium text-ink">{row[1]}</div>
+          <div class="p-4 text-mute">{row[2]}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <CTASection />
+</Layout>

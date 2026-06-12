@@ -1,0 +1,24 @@
+---
+export interface Props {
+  href: string;
+  variant?: "primary" | "secondary";
+  size?: "md" | "lg";
+  class?: string;
+}
+const { href, variant = "primary", size = "lg", class: extra = "" } = Astro.props;
+
+const base =
+  "inline-flex items-center justify-center gap-2 rounded-full font-medium whitespace-nowrap [touch-action:manipulation] transition-[color,background-color,border-color,opacity]";
+const sizes = {
+  md: "h-9 px-4 text-sm",
+  lg: "h-12 px-6 text-base",
+};
+const variants = {
+  primary: "bg-primary text-on-primary hover:opacity-90",
+  secondary: "bg-canvas text-ink border border-hairline hover:border-hairline-strong",
+};
+---
+
+<a href={href} class={`${base} ${sizes[size]} ${variants[variant]} ${extra}`}>
+  <slot />
+</a>

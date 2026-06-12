@@ -1,0 +1,53 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+const articles = [
+  {
+    href: "/resources/overcome-fear-of-public-speaking",
+    title: "How to overcome the fear of public speaking",
+    excerpt:
+      "Glossophobia outranks heights, spiders, and death. Here's why it happens — and the practice loop that actually rewires it.",
+    readingTime: "6 min read",
+  },
+  {
+    href: "/resources/reduce-filler-words",
+    title: "How to stop saying “um” and “uh”",
+    excerpt:
+      "Filler words aren't a character flaw — they're a timing gap. Learn the four techniques that cut them, and how to measure your progress.",
+    readingTime: "5 min read",
+  },
+];
+---
+
+<Layout
+  title="Resources"
+  description="Practical, no-fluff guides to becoming a more confident public speaker — overcoming fear, cutting filler words, and pacing your delivery."
+>
+  <section class="container-page pt-20 pb-12">
+    <p class="font-mono text-xs uppercase tracking-wide text-mute">Resources</p>
+    <h1 class="mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+      Guides to speaking better.
+    </h1>
+    <p class="mt-5 max-w-2xl text-lg text-body">
+      Short, practical reads on the skills SpeechTeacher helps you train.
+    </p>
+  </section>
+
+  <section class="container-page pb-20">
+    <div class="grid gap-6 md:grid-cols-2">
+      {articles.map((a) => (
+        <a
+          href={a.href}
+          class="group flex flex-col rounded-lg border border-hairline bg-canvas p-8 shadow-soft transition-all hover:shadow-float"
+        >
+          <p class="font-mono text-xs text-mute">{a.readingTime}</p>
+          <h2 class="mt-3 text-2xl font-semibold tracking-tight group-hover:text-link">
+            {a.title}
+          </h2>
+          <p class="mt-3 text-body">{a.excerpt}</p>
+          <span class="mt-4 text-sm font-medium text-link">Read article →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

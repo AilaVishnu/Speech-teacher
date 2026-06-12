@@ -1,0 +1,89 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CTASection from "../components/CTASection.astro";
+
+const groups = [
+  {
+    eyebrow: "Privacy",
+    title: "Your voice never leaves your device.",
+    body: "SpeechTeacher runs OpenAI's Whisper speech model directly in your browser using WebAssembly. There is no server to upload audio to, no account to create, and nothing to leak. The first time you visit, the model (~40MB) downloads once and is cached — after that you can practice fully offline.",
+    points: [
+      "100% on-device transcription",
+      "No account, no email, no tracking of your speech",
+      "Works offline after the first load",
+    ],
+  },
+  {
+    eyebrow: "Feedback",
+    title: "Objective metrics, the moment you stop.",
+    body: "Every recording is scored instantly. See your speaking pace in words-per-minute with guidance on whether you're rushing or dragging, a count of every filler word with a per-word breakdown, and a full transcript with fillers highlighted so you can hear your own patterns.",
+    points: [
+      "Words-per-minute with conversational-range guidance",
+      "Filler-word detection: um, uh, like, you know, basically…",
+      "Full transcript with fillers highlighted",
+    ],
+  },
+  {
+    eyebrow: "Progress",
+    title: "Turn single reps into a visible trend.",
+    body: "One practice run tells you how you did today. A streak and trend chart tell you whether you're actually getting better. SpeechTeacher saves your session history locally and plots your pace and filler rate over time, so improvement is something you can see.",
+    points: [
+      "Practice streak to build the habit",
+      "Pace and filler-rate trend charts",
+      "Session history saved locally",
+    ],
+  },
+  {
+    eyebrow: "Prompts",
+    title: "Never stare at a blank page.",
+    body: "Open the trainer and you're handed a speaking prompt — from storytelling to persuasion to impromptu thinking. Shuffle for a new one any time. The point is to remove every excuse between you and your next rep.",
+    points: [
+      "Curated off-the-cuff prompts",
+      "One tap for a fresh topic",
+      "Designed for 30–90 second reps",
+    ],
+  },
+];
+---
+
+<Layout
+  title="Features"
+  description="On-device transcription, instant filler-word and pace feedback, progress charts, and speaking prompts — everything SpeechTeacher does to make you a better speaker, privately."
+>
+  <section class="container-page pt-20 pb-12 text-center">
+    <p class="font-mono text-xs uppercase tracking-wide text-mute">Features</p>
+    <h1 class="mx-auto mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+      Everything you need to practice. Nothing you don't.
+    </h1>
+    <p class="mx-auto mt-5 max-w-2xl text-lg text-body">
+      A focused trainer that gives you a prompt, listens, and tells you the truth —
+      without sending your voice anywhere.
+    </p>
+  </section>
+
+  <section class="container-page space-y-6 pb-16">
+    {groups.map((g, i) => (
+      <div
+        class={`grid items-center gap-8 rounded-lg border border-hairline bg-canvas p-8 shadow-soft md:grid-cols-2 md:p-12 ${
+          i % 2 ? "md:[&>div:first-child]:order-2" : ""
+        }`}
+      >
+        <div>
+          <p class="font-mono text-xs uppercase tracking-wide text-mute">{g.eyebrow}</p>
+          <h2 class="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{g.title}</h2>
+          <p class="mt-4 text-body">{g.body}</p>
+        </div>
+        <ul class="space-y-3">
+          {g.points.map((p) => (
+            <li class="flex items-start gap-3 rounded-md bg-canvas-soft p-4 text-sm">
+              <span class="text-gradient mt-0.5 font-semibold">✓</span>
+              <span class="text-ink">{p}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+
+  <CTASection heading="Try every feature right now." sub="It's free and opens instantly in your browser." />
+</Layout>
