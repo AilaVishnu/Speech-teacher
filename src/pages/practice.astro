@@ -13,16 +13,8 @@ import Layout from "../layouts/Layout.astro";
       <p class="mt-3 text-body">Speak on the spot. Get instant feedback. Nothing leaves your device.</p>
     </div>
 
-    <!-- Model status -->
-    <div id="modelBanner" role="status" aria-live="polite" class="mt-8 rounded-md border border-hairline bg-canvas p-4 text-sm text-body shadow-soft">
-      <span id="modelMsg"><span class="spinner"></span>Loading speech model… first time downloads ~40&nbsp;MB, then it's cached for offline use.</span>
-      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-canvas-soft-2">
-        <div id="modelProgress" class="h-full w-0 rounded-full" style="background:linear-gradient(90deg,#007cf0,#ff0080);transition:width .2s;"></div>
-      </div>
-    </div>
-
     <!-- Prompt -->
-    <div class="mt-6 rounded-lg border border-hairline bg-canvas p-6 shadow-soft">
+    <div class="mt-8 rounded-lg border border-hairline bg-canvas p-6 shadow-soft">
       <p class="font-mono text-xs uppercase tracking-wide text-mute">Today's challenge</p>
       <p id="promptText" class="mt-2 text-xl font-semibold tracking-tight">—</p>
       <button id="newPrompt" class="mt-4 rounded-full border border-hairline bg-canvas px-4 py-2 text-sm font-medium transition-colors hover:border-hairline-strong">↻ New prompt</button>
@@ -31,7 +23,7 @@ import Layout from "../layouts/Layout.astro";
     <!-- Recorder -->
     <div class="mt-6 rounded-lg border border-hairline bg-canvas p-6 text-center shadow-soft">
       <div id="timer" class="text-5xl font-semibold tabular-nums text-mute">0:00</div>
-      <div id="status" role="status" aria-live="polite" class="mt-2 min-h-5 text-sm text-mute">Tap record, then speak about the prompt.</div>
+      <div id="status" role="status" aria-live="polite" class="mt-2 min-h-5 text-sm text-mute"><span class="spinner"></span>Warming up the recorder… read the prompt while you wait.</div>
       <div id="liveTranscript" class="dyn mt-4 max-h-56 min-h-20 overflow-y-auto rounded-md bg-canvas-soft p-4 text-left leading-relaxed"></div>
       <div class="mt-4 flex justify-center gap-3">
         <button id="recordBtn" class="rounded-full bg-error px-6 py-3 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40" disabled>● Record</button>
@@ -155,7 +147,6 @@ const el = id => document.getElementById(id);
 const promptText = el("promptText"), timerEl = el("timer"), statusEl = el("status");
 const liveEl = el("liveTranscript"), recordBtn = el("recordBtn"), stopBtn = el("stopBtn");
 const playback = el("playback"), results = el("results"), streakVal = el("streakVal");
-const modelMsg = el("modelMsg"), modelProgress = el("modelProgress");
 const historyCard = el("historyCard"), histList = el("histList");
 
 function pickPrompt() { promptText.textContent = PROMPTS[Math.floor(Math.random() * PROMPTS.length)]; }
@@ -285,22 +276,12 @@ function showResults(a) {
 }
 
 async function loadModel() {
-  const seen = {};
   try {
-    transcriber = await pipeline("automatic-speech-recognition", "Xenova/whisper-tiny.en", {
-      progress_callback: (p) => {
-        if (p.status === "progress" && p.total) {
-          seen[p.file] = p.loaded/p.total;
-          const vals = Object.values(seen);
-          modelProgress.style.width = Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*100)+"%";
-        }
-      }
-    });
-    modelMsg.textContent = "✓ Speech model ready — runs fully offline now.";
-    modelProgress.style.width = "100%";
+    transcriber = await pipeline("automatic-speech-recognition", "Xenova/whisper-tiny.en");
+    statusEl.textContent = "Tap record, then speak about the prompt.";
     recordBtn.disabled = false;
   } catch (e) {
-    modelMsg.textContent = "⚠️ Couldn't load the speech model: " + (e.message || e) + ". Check your internet for the first load, then refresh.";
+    statusEl.textContent = "⚠️ Couldn't start the recorder. Check your connection and refresh.";
   }
 }
 
