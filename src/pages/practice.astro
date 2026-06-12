@@ -491,7 +491,7 @@ function renderTips(listId, blockId, items, cls, icon) {
 
 async function loadModel() {
   try {
-    transcriber = await pipeline("automatic-speech-recognition", "Xenova/whisper-tiny.en");
+    transcriber = await pipeline("automatic-speech-recognition", "Xenova/whisper-base.en");
     statusEl.textContent = "Tap record, then speak about the prompt.";
     recordBtn.disabled = false;
   } catch (e) {
