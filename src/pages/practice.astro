@@ -24,7 +24,6 @@ import Layout from "../layouts/Layout.astro";
     <div class="mt-6 rounded-lg border border-hairline bg-canvas p-6 text-center shadow-soft">
       <div id="timer" class="text-5xl font-semibold tabular-nums text-mute">0:00</div>
       <div id="status" role="status" aria-live="polite" class="mt-2 min-h-5 text-sm text-mute"><span class="spinner"></span>Warming up the recorder… read the prompt while you wait.</div>
-      <div id="liveTranscript" class="dyn mt-4 max-h-56 min-h-20 overflow-y-auto rounded-md bg-canvas-soft p-4 text-left leading-relaxed"></div>
       <div class="mt-4 flex justify-center gap-3">
         <button id="recordBtn" class="rounded-full bg-error px-6 py-3 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40" disabled>● Record</button>
         <button id="stopBtn" class="rounded-full bg-warning px-6 py-3 font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-40" disabled>■ Stop</button>
@@ -32,27 +31,89 @@ import Layout from "../layouts/Layout.astro";
       <audio id="playback" class="mt-4 hidden w-full" controls></audio>
     </div>
 
-    <!-- Results -->
+    <!-- Results / coaching report -->
     <div id="results" class="dyn mt-6 hidden rounded-lg border border-hairline bg-canvas p-6 shadow-soft">
-      <h2 class="text-sm font-semibold">Your delivery</h2>
-      <div class="mt-3 grid grid-cols-3 gap-3">
+      <!-- Score header -->
+      <div class="flex items-center gap-5">
+        <div id="scoreRing" class="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-hairline">
+          <span id="scoreVal" class="text-2xl font-semibold tabular-nums">—</span>
+        </div>
+        <div>
+          <h2 id="scoreLabel" class="text-lg font-semibold tracking-tight">Your delivery</h2>
+          <p id="scoreSummary" class="mt-1 text-sm text-body"></p>
+        </div>
+      </div>
+
+      <!-- Metric grid -->
+      <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div class="rounded-md bg-canvas-soft p-4 text-center">
-          <div id="mPace" class="text-3xl font-semibold tabular-nums">—</div>
+          <div id="mPace" class="text-2xl font-semibold tabular-nums">—</div>
           <div class="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-mute">Words / min</div>
           <div id="mPaceSub" class="sub"></div>
         </div>
         <div class="rounded-md bg-canvas-soft p-4 text-center">
-          <div id="mFiller" class="text-3xl font-semibold tabular-nums">—</div>
+          <div id="mFiller" class="text-2xl font-semibold tabular-nums">—</div>
           <div class="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-mute">Filler words</div>
           <div id="mFillerSub" class="sub"></div>
         </div>
         <div class="rounded-md bg-canvas-soft p-4 text-center">
-          <div id="mWords" class="text-3xl font-semibold tabular-nums">—</div>
+          <div id="mDuration" class="text-2xl font-semibold tabular-nums">—</div>
+          <div class="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-mute">Duration</div>
+          <div id="mDurationSub" class="sub"></div>
+        </div>
+        <div class="rounded-md bg-canvas-soft p-4 text-center">
+          <div id="mWords" class="text-2xl font-semibold tabular-nums">—</div>
           <div class="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-mute">Total words</div>
           <div id="mWordsSub" class="sub"></div>
         </div>
+        <div class="rounded-md bg-canvas-soft p-4 text-center">
+          <div id="mSentence" class="text-2xl font-semibold tabular-nums">—</div>
+          <div class="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-mute">Avg words / sentence</div>
+          <div id="mSentenceSub" class="sub"></div>
+        </div>
+        <div class="rounded-md bg-canvas-soft p-4 text-center">
+          <div id="mUnique" class="text-2xl font-semibold tabular-nums">—</div>
+          <div class="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-mute">Vocabulary variety</div>
+          <div id="mUniqueSub" class="sub"></div>
+        </div>
+        <div class="rounded-md bg-canvas-soft p-4 text-center">
+          <div id="mWeak" class="text-2xl font-semibold tabular-nums">—</div>
+          <div class="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-mute">Vague / weak words</div>
+          <div id="mWeakSub" class="sub"></div>
+        </div>
+        <div class="rounded-md bg-canvas-soft p-4 text-center">
+          <div id="mPauses" class="text-2xl font-semibold tabular-nums">—</div>
+          <div class="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-mute">Long pauses</div>
+          <div id="mPausesSub" class="sub"></div>
+        </div>
       </div>
-      <div id="fillerBreakdown" class="mt-3 flex flex-wrap gap-2"></div>
+
+      <!-- Transcript with highlights -->
+      <div class="mt-6">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-sm font-semibold">What you said</h3>
+          <div class="flex gap-3 text-xs text-mute">
+            <span><span class="lg-filler"></span> filler word</span>
+            <span><span class="lg-weak"></span> vague / weak</span>
+          </div>
+        </div>
+        <div id="transcriptBox" class="dyn mt-2 max-h-72 overflow-y-auto rounded-md bg-canvas-soft p-4 text-left leading-relaxed"></div>
+      </div>
+
+      <!-- What to improve -->
+      <div id="improveBlock" class="mt-6 hidden">
+        <h3 class="text-sm font-semibold">What to improve</h3>
+        <ul id="improveList" class="dyn mt-3 space-y-2"></ul>
+      </div>
+
+      <!-- What you did well -->
+      <div id="strengthBlock" class="mt-6 hidden">
+        <h3 class="text-sm font-semibold">What you did well</h3>
+        <ul id="strengthList" class="dyn mt-3 space-y-2"></ul>
+      </div>
+
+      <!-- Filler breakdown -->
+      <div id="fillerBreakdown" class="mt-5 flex flex-wrap gap-2"></div>
     </div>
 
     <!-- Streak -->
@@ -99,12 +160,18 @@ import Layout from "../layouts/Layout.astro";
   .dot.pulse { animation: pulse 1s infinite; }
   @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
   .dyn .filler { color:#ee0000; font-weight:700; text-decoration:underline; }
-  .dyn .interim { color:#888; }
-  .dyn #liveTranscript:empty::before { content:"Your transcript will appear here after you stop…"; color:#888; }
+  .dyn .weak { color:#ab570a; text-decoration:underline; text-decoration-style:dotted; }
+  .dyn #transcriptBox:empty::before { content:"Your transcript will appear here after you stop…"; color:#888; }
+  .lg-filler, .lg-weak { display:inline-block; width:10px; height:10px; border-radius:2px; vertical-align:middle; margin-right:3px; }
+  .lg-filler { background:#ee0000; } .lg-weak { background:#f5a623; }
   .sub { font-size:11px; margin-top:4px; }
   .v-good { color:#0070f3; } .v-warn { color:#ab570a; } .v-bad { color:#ee0000; }
   .chip { background:#fafafa; border:1px solid #ebebeb; border-radius:9999px; padding:5px 12px; font-size:13px; }
   .chip b { color:#ee0000; }
+  .tip { display:flex; gap:10px; align-items:flex-start; background:#fafafa; border:1px solid #ebebeb; border-radius:8px; padding:10px 12px; font-size:14px; line-height:1.5; }
+  .tip .ic { flex-shrink:0; font-weight:700; line-height:1.5; }
+  .tip.improve .ic { color:#ab570a; } .tip.good .ic { color:#0070f3; }
+  .tip b { color:#171717; }
   .hist-row { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; background:#fafafa; border-radius:8px; padding:10px 12px; font-size:13px; }
   .hist-row .when { color:#888; font-variant-numeric:tabular-nums; white-space:nowrap; }
   .hist-row .what { color:#171717; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -139,13 +206,16 @@ const FILLERS = ["um","uh","umm","uhh","like","you know","so","actually","basica
 const MULTI_FILLERS = FILLERS.filter(f => f.includes(" "));
 const SINGLE_FILLERS = new Set(FILLERS.filter(f => !f.includes(" ")));
 
+// Vague / hedging words (distinct from fillers) — weaken a message
+const WEAK = new Set(["just","really","very","maybe","probably","perhaps","stuff","things","pretty","honestly","obviously","somewhat","quite","guess","kinda","sorta"]);
+
 let mediaRecorder = null, chunks = [], stream = null;
 let startTime = 0, durationMs = 0, timerInterval = null, recording = false;
 let transcriber = null;
 
 const el = id => document.getElementById(id);
 const promptText = el("promptText"), timerEl = el("timer"), statusEl = el("status");
-const liveEl = el("liveTranscript"), recordBtn = el("recordBtn"), stopBtn = el("stopBtn");
+const transcriptBox = el("transcriptBox"), recordBtn = el("recordBtn"), stopBtn = el("stopBtn");
 const playback = el("playback"), results = el("results"), streakVal = el("streakVal");
 const historyCard = el("historyCard"), histList = el("histList");
 
@@ -229,50 +299,194 @@ function tick() { timerEl.textContent = fmt(Date.now()-startTime); }
 function renderTranscript(text) {
   const safe = s => s.replace(/[&<>]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c]));
   const words = text.trim().split(/\s+/).filter(Boolean);
-  liveEl.innerHTML = words.map(w => {
+  transcriptBox.innerHTML = words.map(w => {
     const clean = w.toLowerCase().replace(/[^a-z']/g,"");
-    return SINGLE_FILLERS.has(clean) ? '<span class="filler">'+safe(w)+"</span>" : safe(w);
+    if (SINGLE_FILLERS.has(clean)) return '<span class="filler">'+safe(w)+"</span>";
+    if (WEAK.has(clean)) return '<span class="weak">'+safe(w)+"</span>";
+    return safe(w);
   }).join(" ");
-  liveEl.scrollTop = liveEl.scrollHeight;
 }
 
-function analyze(transcript, ms) {
+function analyze(transcript, ms, pauses) {
   const text = " " + transcript.toLowerCase().replace(/[^a-z' ]/g," ").replace(/\s+/g," ") + " ";
   const words = transcript.trim().split(/\s+/).filter(Boolean);
-  const totalWords = words.length, minutes = ms/60000;
+  const totalWords = words.length, durationSec = Math.round(ms/1000), minutes = ms/60000;
+
+  // Fillers (multi-word first, then single)
   const counts = {}; let totalFillers = 0, working = text;
   MULTI_FILLERS.forEach(f => {
     const re = new RegExp("\\s"+f.replace(/ /g,"\\s")+"\\s","g");
     const m = working.match(re);
     if (m) { counts[f]=m.length; totalFillers+=m.length; working=working.replace(re,"  "); }
   });
-  working.trim().split(/\s+/).filter(Boolean).forEach(w => {
-    if (SINGLE_FILLERS.has(w)) { counts[w]=(counts[w]||0)+1; totalFillers++; }
-  });
+  const cleanWords = working.trim().split(/\s+/).filter(Boolean);
+  cleanWords.forEach(w => { if (SINGLE_FILLERS.has(w)) { counts[w]=(counts[w]||0)+1; totalFillers++; } });
+
+  // Weak / vague words
+  let weakCount = 0; const weakCounts = {};
+  cleanWords.forEach(w => { if (WEAK.has(w)) { weakCount++; weakCounts[w]=(weakCounts[w]||0)+1; } });
+  const topWeak = Object.entries(weakCounts).sort((a,b)=>b[1]-a[1])[0];
+
+  // Sentences (Whisper emits punctuation)
+  const sentences = transcript.split(/[.!?]+/).map(s=>s.trim()).filter(s=>s.split(/\s+/).filter(Boolean).length>0);
+  const sentenceCount = sentences.length || 1;
+  const avgSentence = Math.round(totalWords / sentenceCount);
+  const longestSentence = sentences.reduce((m,s)=>Math.max(m,s.split(/\s+/).filter(Boolean).length),0);
+
+  // Vocabulary variety (unique non-filler words / total)
+  const uniq = new Set(words.map(w=>w.toLowerCase().replace(/[^a-z']/g,"")).filter(Boolean));
+  const diversity = totalWords > 0 ? Math.round((uniq.size/totalWords)*100) : 0;
+
+  // Repeated consecutive words ("the the")
+  let repeats = 0;
+  for (let i=1;i<cleanWords.length;i++) if (cleanWords[i] && cleanWords[i]===cleanWords[i-1]) repeats++;
+
   const wpm = minutes > 0 ? Math.round(totalWords/minutes) : 0;
   const fillerRate = totalWords > 0 ? (totalFillers/totalWords)*100 : 0;
-  return { totalWords, wpm, totalFillers, fillerRate, counts };
+  const topFiller = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+
+  const pauseList = pauses || [];
+  const longestPause = pauseList.reduce((m,p)=>Math.max(m,p),0);
+
+  // Composite score
+  let score = 100;
+  score -= Math.min(28, fillerRate*3);
+  if (wpm > 0 && wpm < 110) score -= Math.min(20, (110-wpm)/3);
+  if (wpm > 160) score -= Math.min(20, (wpm-160)/3);
+  score -= Math.min(15, (weakCount/Math.max(totalWords,1))*100*1.5);
+  if (avgSentence > 25) score -= Math.min(15, (avgSentence-25)/2);
+  score -= Math.min(10, repeats*3);
+  if (longestPause > 3) score -= Math.min(10, (longestPause-3)*2);
+  if (durationSec < 20) score -= 12;
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  return {
+    totalWords, durationSec, wpm, totalFillers, fillerRate, counts, topFiller,
+    weakCount, topWeak, sentenceCount, avgSentence, longestSentence,
+    diversity, repeats, pauseCount: pauseList.length, longestPause, score
+  };
 }
+
+function setMetric(id, val, subText, subClass) {
+  el(id).textContent = val;
+  const sub = el(id+"Sub");
+  if (sub) { sub.textContent = subText || ""; sub.className = "sub" + (subClass ? " "+subClass : ""); }
+}
+function fmtDur(sec) { return sec >= 60 ? Math.floor(sec/60)+"m "+(sec%60)+"s" : sec+"s"; }
 
 function showResults(a) {
   results.classList.remove("hidden");
-  el("mPace").textContent = a.wpm;
-  const pace = el("mPaceSub");
-  if (a.wpm === 0) { pace.textContent=""; pace.className="sub"; }
-  else if (a.wpm < 110) { pace.textContent="A bit slow"; pace.className="sub v-warn"; }
-  else if (a.wpm <= 160) { pace.textContent="Great pace ✓"; pace.className="sub v-good"; }
-  else { pace.textContent="Slow down"; pace.className="sub v-bad"; }
-  el("mFiller").textContent = a.totalFillers;
-  const fs = el("mFillerSub");
-  if (a.fillerRate <= 2) { fs.textContent="Clean ✓"; fs.className="sub v-good"; }
-  else if (a.fillerRate <= 5) { fs.textContent=a.fillerRate.toFixed(1)+"% of words"; fs.className="sub v-warn"; }
-  else { fs.textContent=a.fillerRate.toFixed(1)+"% — trim these"; fs.className="sub v-bad"; }
-  el("mWords").textContent = a.totalWords;
+
+  // Score ring
+  el("scoreVal").textContent = a.score;
+  const ring = el("scoreRing");
+  let band, color;
+  if (a.score >= 85) { band = "Excellent delivery"; color = "#0070f3"; }
+  else if (a.score >= 70) { band = "Good — a few tweaks"; color = "#29bc9b"; }
+  else if (a.score >= 50) { band = "Fair — clear room to grow"; color = "#f5a623"; }
+  else { band = "Needs work — keep at it"; color = "#ee0000"; }
+  ring.style.borderColor = color;
+  el("scoreVal").style.color = color;
+  el("scoreLabel").textContent = band;
+  el("scoreSummary").textContent =
+    `You spoke ${a.totalWords} words in ${fmtDur(a.durationSec)} at ${a.wpm} WPM, with ${a.totalFillers} filler word${a.totalFillers===1?"":"s"}.`;
+
+  // Pace
+  if (a.wpm === 0) setMetric("mPace", "—", "", "");
+  else if (a.wpm < 110) setMetric("mPace", a.wpm, "A bit slow", "v-warn");
+  else if (a.wpm <= 160) setMetric("mPace", a.wpm, "Great pace ✓", "v-good");
+  else setMetric("mPace", a.wpm, "Too fast", "v-bad");
+
+  // Fillers
+  if (a.fillerRate <= 2) setMetric("mFiller", a.totalFillers, "Clean ✓", "v-good");
+  else if (a.fillerRate <= 5) setMetric("mFiller", a.totalFillers, a.fillerRate.toFixed(1)+"% of words", "v-warn");
+  else setMetric("mFiller", a.totalFillers, a.fillerRate.toFixed(1)+"% — trim", "v-bad");
+
+  // Duration
+  setMetric("mDuration", fmtDur(a.durationSec),
+    a.durationSec < 20 ? "Too short" : a.durationSec > 120 ? "Long" : "Good length",
+    a.durationSec < 20 ? "v-warn" : "v-good");
+
+  // Words
+  setMetric("mWords", a.totalWords, a.sentenceCount + " sentence" + (a.sentenceCount===1?"":"s"), "");
+
+  // Avg sentence length
+  setMetric("mSentence", a.avgSentence,
+    a.avgSentence > 25 ? "Long sentences" : "Easy to follow",
+    a.avgSentence > 25 ? "v-warn" : "v-good");
+
+  // Vocabulary variety
+  setMetric("mUnique", a.diversity + "%",
+    a.diversity >= 55 ? "Varied" : "Repetitive",
+    a.diversity >= 55 ? "v-good" : "v-warn");
+
+  // Weak words
+  setMetric("mWeak", a.weakCount,
+    a.weakCount <= 1 ? "Confident ✓" : a.topWeak ? "e.g. \""+a.topWeak[0]+"\"" : "",
+    a.weakCount <= 1 ? "v-good" : "v-warn");
+
+  // Pauses
+  setMetric("mPauses", a.pauseCount,
+    a.longestPause ? "longest "+a.longestPause.toFixed(1)+"s" : "smooth",
+    a.longestPause > 3 ? "v-warn" : "v-good");
+
+  // ── Generate coaching tips ──
+  const improve = [], strong = [];
+
+  if (a.totalFillers > 0) {
+    const top = a.topFiller ? ` Your most common was <b>"${a.topFiller[0]}"</b> (${a.topFiller[1]}×).` : "";
+    if (a.fillerRate > 5)
+      improve.push(`<b>Cut filler words.</b> ${a.totalFillers} fillers is ${a.fillerRate.toFixed(1)}% of your speech.${top} Replace them with a short silent pause — silence reads as confidence.`);
+    else
+      improve.push(`<b>Trim a few fillers.</b> You used ${a.totalFillers}.${top} When you feel one coming, just pause instead.`);
+  }
+  if (a.wpm > 160)
+    improve.push(`<b>Slow down.</b> At ${a.wpm} WPM you're racing. Aim for 110–160 — pause between ideas so each point lands.`);
+  if (a.wpm > 0 && a.wpm < 110 && a.durationSec >= 15)
+    improve.push(`<b>Pick up the pace.</b> ${a.wpm} WPM is on the slow side. Add energy and close the gaps between thoughts.`);
+  if (a.weakCount >= 3)
+    improve.push(`<b>Sound more certain.</b> You used ${a.weakCount} vague/hedging words${a.topWeak?` (like "${a.topWeak[0]}")`:""}. Swap them for concrete, direct phrasing.`);
+  if (a.avgSentence > 25)
+    improve.push(`<b>Shorten your sentences.</b> They average ${a.avgSentence} words${a.longestSentence?` (longest ${a.longestSentence})`:""}. Make a point, stop, then the next one.`);
+  if (a.repeats > 0)
+    improve.push(`<b>Watch repeated words.</b> You stumbled on a back-to-back repeat ${a.repeats} time${a.repeats===1?"":"s"}. A slight slow-down prevents it.`);
+  if (a.longestPause > 3)
+    improve.push(`<b>Mind the long gaps.</b> Your longest pause was ${a.longestPause.toFixed(1)}s — short pauses are great, but very long ones read as losing your place.`);
+  if (a.durationSec < 20)
+    improve.push(`<b>Speak longer.</b> You went for ${fmtDur(a.durationSec)}. Aim for 30–90s to give yourself a real rep.`);
+  if (a.diversity < 45 && a.totalWords > 30)
+    improve.push(`<b>Vary your words.</b> Only ${a.diversity}% of your words were unique — you leaned on a few. Reach for synonyms and concrete detail.`);
+  if (a.sentenceCount < 2 && a.totalWords > 40)
+    improve.push(`<b>Add structure.</b> It ran as one long thought. Try: state your point, give one example, then close.`);
+
+  if (a.fillerRate <= 2) strong.push(`<b>Clean delivery</b> — almost no filler words.`);
+  if (a.wpm >= 110 && a.wpm <= 160) strong.push(`<b>Great conversational pace</b> at ${a.wpm} WPM.`);
+  if (a.weakCount <= 1) strong.push(`<b>Confident, direct language</b> — little hedging.`);
+  if (a.avgSentence <= 20 && a.sentenceCount >= 2) strong.push(`<b>Well-sized sentences</b> that are easy to follow.`);
+  if (a.diversity >= 60) strong.push(`<b>Varied vocabulary</b> — you didn't repeat yourself much.`);
+  if (a.durationSec >= 30 && a.durationSec <= 120) strong.push(`<b>Good length</b> — enough to actually evaluate.`);
+  if (a.longestPause && a.longestPause <= 2 && a.pauseCount > 0) strong.push(`<b>Tight pacing</b> — no awkward dead air.`);
+
+  if (!improve.length) improve.push(`<b>Nothing major to fix.</b> Keep doing reps to lock this in.`);
+
+  renderTips("improveList", "improveBlock", improve, "improve", "→");
+  renderTips("strengthList", "strengthBlock", strong, "good", "✓");
+
+  // Filler breakdown chips
   const bd = el("fillerBreakdown");
   const entries = Object.entries(a.counts).sort((x,y)=>y[1]-x[1]);
   bd.innerHTML = entries.length
     ? entries.map(([w,c]) => '<span class="chip">'+w+' <b>'+c+"</b></span>").join("")
     : '<span class="chip" style="color:#0070f3">No filler words — nice! ✓</span>';
+}
+
+function renderTips(listId, blockId, items, cls, icon) {
+  const block = el(blockId);
+  if (!items.length) { block.classList.add("hidden"); return; }
+  block.classList.remove("hidden");
+  el(listId).innerHTML = items.map(t =>
+    '<li class="tip '+cls+'"><span class="ic">'+icon+'</span><span>'+t+'</span></li>'
+  ).join("");
 }
 
 async function loadModel() {
@@ -300,7 +514,7 @@ async function blobTo16kMono(blob) {
 async function startRecording() {
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
   catch (e) { statusEl.textContent = "🎤 Microphone access denied. Allow it and try again."; return; }
-  chunks = []; liveEl.innerHTML = ""; results.classList.add("hidden"); playback.classList.add("hidden");
+  chunks = []; transcriptBox.innerHTML = ""; results.classList.add("hidden"); playback.classList.add("hidden");
   mediaRecorder = new MediaRecorder(stream);
   mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
   mediaRecorder.onstop = onStopped;
@@ -327,11 +541,25 @@ async function onStopped() {
   statusEl.innerHTML = '<span class="spinner"></span> Transcribing on your device…';
   try {
     const audio = await blobTo16kMono(blob);
-    const out = await transcriber(audio, { chunk_length_s: 30, stride_length_s: 5 });
+    const out = await transcriber(audio, { chunk_length_s: 30, stride_length_s: 5, return_timestamps: true });
     const transcript = (out.text || "").trim();
     if (!transcript) { statusEl.textContent = "⚠️ Didn't catch any speech. Try speaking a bit louder and longer."; recordBtn.disabled = false; return; }
+
+    // Detect long pauses from segment timestamps
+    const pauses = [];
+    if (Array.isArray(out.chunks)) {
+      for (let i = 1; i < out.chunks.length; i++) {
+        const prevEnd = out.chunks[i-1].timestamp && out.chunks[i-1].timestamp[1];
+        const curStart = out.chunks[i].timestamp && out.chunks[i].timestamp[0];
+        if (typeof prevEnd === "number" && typeof curStart === "number") {
+          const gap = curStart - prevEnd;
+          if (gap >= 1.0) pauses.push(gap);
+        }
+      }
+    }
+
     renderTranscript(transcript);
-    const a = analyze(transcript, durationMs);
+    const a = analyze(transcript, durationMs, pauses);
     showResults(a); bumpStreak(); saveSession(promptText.textContent, a); renderHistory();
     statusEl.textContent = "Done! Review your delivery below.";
   } catch (e) {
