@@ -504,11 +504,31 @@ async function blobTo16kMono(blob) {
   const ac = new (window.AudioContext || window.webkitAudioContext)();
   const decoded = await ac.decodeAudioData(arrayBuffer);
   ac.close();
-  const offline = new OfflineAudioContext(1, Math.ceil(decoded.duration*16000), 16000);
-  const src = offline.createBufferSource();
-  src.buffer = decoded; src.connect(offline.destination); src.start();
-  const rendered = await offline.startRendering();
-  return rendered.getChannelData(0);
+
+  // Downmix all channels to mono using the real sample count
+  // (MediaRecorder WebM duration metadata is unreliable, so never derive length from .duration)
+  const channels = decoded.numberOfChannels;
+  const len = decoded.length;
+  const mono = new Float32Array(len);
+  for (let c = 0; c < channels; c++) {
+    const data = decoded.getChannelData(c);
+    for (let i = 0; i < len; i++) mono[i] += data[i] / channels;
+  }
+
+  // Resample to 16 kHz with linear interpolation
+  const srcRate = decoded.sampleRate;
+  if (srcRate === 16000) return mono;
+  const ratio = srcRate / 16000;
+  const outLen = Math.floor(len / ratio);
+  const out = new Float32Array(outLen);
+  for (let i = 0; i < outLen; i++) {
+    const pos = i * ratio;
+    const i0 = Math.floor(pos);
+    const i1 = Math.min(i0 + 1, len - 1);
+    const frac = pos - i0;
+    out[i] = mono[i0] * (1 - frac) + mono[i1] * frac;
+  }
+  return out;
 }
 
 // Loudness of the captured audio — used to detect a dead/silent mic
